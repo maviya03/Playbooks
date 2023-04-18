@@ -1,0 +1,53 @@
+---
+  - name: crating LVM patiton 
+    hosts: node
+    tasks: 
+      - name: initialize PV and make VG in /dev/sdc of size 3GB
+        community.general.lvg:
+            vg: myvg
+            pvs: /dev/sdc
+            pesize: 3G
+
+      - name: Now create a LVM wit name lv01
+        lvol:
+              vg: myvg
+              lv: lv01
+              size: 1024
+              force: true
+      - name: Now create a LVM wit name lv02
+        lvol:
+              vg: myvg
+              lv: lv02
+              size: 1024
+              force: true
+
+      - name: Now formatting lv01 with file system ext4
+        community.general.filesystem:
+          fstype: ext4
+          dev: /dev/myvg/lv01
+      - name: Now formatting lv02 with file system xfs
+        community.general.filesystem:
+          fstype: xfs
+          dev: /dev/myvg/lv02
+
+      - name: Now create a directory to mount the lv01
+        file:
+          path: /lvm1
+          state: directory
+      - name: Now create a directory to mount the lv01
+        file:
+          path: /lvm2
+          state: directory
+
+      - name: Now mount the storage lv01 on /lvm1 permanently by doing entry in /etc/fstab
+        ansible.posix.mount:
+          path: /lvm1
+          src: /dev/myvg/lv01
+          fstype: ext4
+          state: mounted
+      - name: Now mount the storage lv01 on /lvm1 permanently by doing entry in /etc/fstab
+        ansible.posix.mount:
+          path: /lvm1
+          src: /dev/myvg/lv01
+          fstype: ext4
+          state: mounted

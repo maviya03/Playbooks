@@ -1,0 +1,17 @@
+---
+  - name: creating a group and user and created user is a member of created group
+    hosts: all
+    tasks: 
+    - name: create group "gip" present
+      ansible.builtin.group:
+        name: gip
+        state: present
+
+    - name: Add the user 'Grras' with a specific uid and a primary group of 'gip'
+      ansible.builtin.user:
+        name: grrassolution
+        comment: Grras solution
+        group: gip
+        password: $6$sFNUpGVW1vgN2h/Q$GqD0ORSTsBrCca4638kknW3hTFkH.6Xfn69a4OP8IaSbnYHe8cHhit1x6hbl1qJC4QWiUGbICsNP0QGLPqmpL.
+
+

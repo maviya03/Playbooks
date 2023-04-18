@@ -1,0 +1,50 @@
+---
+  - name: creating a pration of 2 Gb 
+    hosts: node
+    tasks:
+      - name: Create a new ext4 primary partition
+        community.general.parted:
+          device: /dev/sdb
+          number: 1
+          state: present
+          fs_type: ext4
+          part_end: 2GiB
+      - name: Create a new xfs primary partition
+        community.general.parted:
+          device: /dev/sdb
+          number: 2
+          state: present
+          fs_type: xfs
+          part_start: 2GiB
+          part_end: 4GiB
+
+      - name: fomatting with file system ext4
+        filesystem:
+          fstype: ext4
+          dev: /dev/sdb1
+      - name: Create a ext2 filesystem on /dev/sdb1
+        community.general.filesystem:
+              fstype: xfs
+              dev: /dev/sdb2
+
+      - name: create a directory to mount sdb1
+        file:
+          path: /part/one
+          state: directory
+      - name: create a directory to mount sdb2 
+        file:
+          path: /path/two
+          state: directory
+
+      - name: Do entry in /etc/fstab and also mount it on /part/two
+        mount: 
+          path: /part/one
+          src: /dev/sdb1
+          fstype: ext4
+          state: mounted
+      - name: Do entery in /etc/fstab and also mount it to /part/two
+        ansible.posix.mount:
+            path: /part/two
+            src: /dev/sdb2
+            fstype: xfs
+            state: mounted

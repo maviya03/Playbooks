@@ -1,0 +1,26 @@
+---
+  - name: Configuring yum repo 
+    hosts: node
+    tasks:
+          - name: Mount DVD read-only
+            ansible.posix.mount:
+                path: /mnt
+                src: /dev/sr0
+                fstype: iso9660
+                state: mounted
+         
+          - name: configuring .repo file for AppStream 
+            yum_repository:
+                baseurl: file:///mnt/AppStream
+                gpgcheck: no
+                enabled: yes
+                description: built in AppStream repo from ISO file 
+                name: AppStream
+          
+          - name: configuring .repo file for BaseOS 
+            yum_repository:
+                baseurl: file:///mnt/BaseOS
+                gpgcheck: no
+                enabled: yes
+                description: built in BaseOS repo from ISO file 
+                name: BaseOS

@@ -1,0 +1,45 @@
+---
+- name: playbook to configure dns sever
+  hosts: cloud
+  vars:
+    pkg_name:
+      - bind
+      - bind-utils
+  tasks:
+      
+      - name: installing the package {{ pkg_name }}
+        yum:
+          name: "{{ pkg_name }}"
+          state: latest
+
+      - name: delete the previous /etc/named.conf
+        file:
+          path: /etc/named.conf
+          state: absent
+
+      - name: make entry in /etc/named.conf
+        blockinfile:
+          path: /etc/named.conf
+          block: |
+            options {
+                directory "/var/named";
+                recursion no;
+            };
+            zone "maviyakhan.tech" IN {
+                type master;
+                file "maviya";
+            };
+          create: yes
+
+      - name: make entry in zone file "maviya"
+        copy:
+          src: maviya
+          dest: /var/named/maviya
+          owner: named
+          group: named
+
+      - name: now enable and restart named service
+        service:
+          name: named
+          state: restarted
+          enabled: yes

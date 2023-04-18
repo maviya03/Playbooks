@@ -1,0 +1,11 @@
+---
+  - name: creating a Directory with permissions
+    hosts: all
+
+    tasks:
+      - name: Create a directory if it does not exist
+        ansible.builtin.file:
+          path: /grrassolutions
+          state: directory
+          mode: '1707'
+
